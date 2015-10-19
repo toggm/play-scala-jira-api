@@ -1,0 +1,177 @@
+{
+	"expand":"editmeta,renderedFields,transitions,changelog,operations",
+	"id":"11720",
+	"self":"https://yourjira.instance.com/rest/api/2/issue/11720",
+	"key":"LAS-37",
+	"fields":{
+		"summary":"Handle Login failure",
+		"progress":{
+			"progress":0,
+			"total":0
+		},
+		"issuetype":{
+			"self":"https://yourjira.instance.com/rest/api/2/issuetype/1",
+			"id":"1",
+			"description":"A problem which impairs or prevents the functions of the product.",
+			"iconUrl":"https://yourjira.instance.com/images/icons/issuetypes/bug.png",
+			"name":"Bug",
+			"subtask":false
+		},
+		"votes":{
+			"self":"https://yourjira.instance.com/rest/api/2/issue/LAS-37/votes",
+			"votes":0,
+			"hasVoted":false
+		},
+		"resolution":null,
+		"fixVersions":[
+			{
+				"self":"https://yourjira.instance.com/rest/api/2/version/10596",
+				"id":"10596",
+				"description":"Demo release",
+				"name":"Demo_1.0",
+				"archived":false,
+				"released":false
+			}
+		],
+		"resolutiondate":null,
+		"timespent":null,
+		"creator":{
+			"self":"https://yourjira.instance.com/rest/api/2/user?username=user.name",
+			"name":"user.name",
+			"emailAddress":"user.name@aName.com",
+			"avatarUrls":{
+				"16x16":"https://yourjira.instance.com/secure/useravatar?size=xsmall&avatarId=10182",
+				"24x24":"https://yourjira.instance.com/secure/useravatar?size=small&avatarId=10182",
+				"32x32":"https://yourjira.instance.com/secure/useravatar?size=medium&avatarId=10182",
+				"48x48":"https://yourjira.instance.com/secure/useravatar?avatarId=10182"
+			},
+			"displayName":"User Name",
+			"active":true
+		},
+		"reporter":{
+			"self":"https://yourjira.instance.com/rest/api/2/user?username=user.name",
+			"name":"user.name",
+			"emailAddress":"user.name@aName.com",
+			"avatarUrls":{
+				"16x16":"https://yourjira.instance.com/secure/useravatar?size=xsmall&avatarId=10182",
+				"24x24":"https://yourjira.instance.com/secure/useravatar?size=small&avatarId=10182",
+				"32x32":"https://yourjira.instance.com/secure/useravatar?size=medium&avatarId=10182",
+				"48x48":"https://yourjira.instance.com/secure/useravatar?avatarId=10182"
+			},
+			"displayName":"User Name",
+			"active":true
+		},
+		"aggregatetimeoriginalestimate":null,
+		"created":"2015-09-24T16:43:40.000+0200",
+		"updated":"2015-09-24T16:44:46.000+0200",
+		"description":null,
+		"priority":{
+			"self":"https://yourjira.instance.com/rest/api/2/priority/3",
+			"iconUrl":"https://yourjira.instance.com/images/icons/priorities/major.png",
+			"name":"Major","id":"3"
+		},
+		"duedate":null,
+		"customfield_10020":null,
+		"customfield_10021":null,
+		"issuelinks":[
+			{
+				"id":"11134",
+				"self":"https://yourjira.instance.com/rest/api/2/issueLink/11134",
+				"type":{
+					"id":"10120",
+					"name":"follow up",
+					"inward":"follows up",
+					"outward":"is followed by",
+					"self":"https://yourjira.instance.com/rest/api/2/issueLinkType/10120"
+				},
+				"inwardIssue":{
+					"id":"11718",
+					"key":"LAS-35",
+					"self":"https://yourjira.instance.com/rest/api/2/issue/11718",
+					"fields":{
+						"summary":"Demo Instanz einrichten",
+						"status":{
+							"self":"https://yourjira.instance.com/rest/api/2/status/3",
+							"description":"This issue is being actively worked on at the moment by the assignee.",
+							"iconUrl":"https://yourjira.instance.com/images/icons/statuses/inprogress.png",
+							"name":"In Progress",
+							"id":"3",
+							"statusCategory":{
+								"self":"https://yourjira.instance.com/rest/api/2/statuscategory/4",
+								"id":4,
+								"key":"indeterminate",
+								"colorName":"yellow",
+								"name":"In Progress"
+							}
+						},
+						"priority":{
+							"self":"https://yourjira.instance.com/rest/api/2/priority/3",
+							"iconUrl":"https://yourjira.instance.com/images/icons/priorities/major.png",
+							"name":"Major",
+							"id":"3"
+						},
+						"issuetype":{
+							"self":"https://yourjira.instance.com/rest/api/2/issuetype/2",
+							"id":"2",
+							"description":"A new feature of the product, which has yet to be developed.",
+							"iconUrl":"https://yourjira.instance.com/images/icons/issuetypes/newfeature.png",
+							"name":"New Feature",
+							"subtask":false
+						}
+					}
+				}
+			}
+		],
+		"customfield_10022":"561",
+		"watches":{
+			"self":"https://yourjira.instance.com/rest/api/2/issue/LAS-37/watchers",
+			"watchCount":1,
+			"isWatching":true
+		},
+		"customfield_10000":null,
+		"customfield_10026":null,
+		"subtasks":[],
+		"status":{
+			"self":"https://yourjira.instance.com/rest/api/2/status/10004",
+			"description":"",
+			"iconUrl":"https://yourjira.instance.com/images/icons/statuses/open.png",
+			"name":"To Do",
+			"id":"10004",
+			"statusCategory":{
+				"self":"https://yourjira.instance.com/rest/api/2/statuscategory/1",
+				"id":1,
+				"key":"undefined",
+				"colorName":"medium-gray",
+				"name":"No Category"
+			}
+		},
+		"labels":[],
+		"workratio":-1,
+		"assignee":null,
+		"aggregatetimeestimate":null,
+		"project":{
+			"self":"https://yourjira.instance.com/rest/api/2/project/10200",
+			"id":"10200",
+			"key":"LAS",
+			"name":"lasius",
+			"avatarUrls":{
+				"16x16":"https://yourjira.instance.com/secure/projectavatar?size=xsmall&pid=10200&avatarId=10011",
+				"24x24":"https://yourjira.instance.com/secure/projectavatar?size=small&pid=10200&avatarId=10011",
+				"32x32":"https://yourjira.instance.com/secure/projectavatar?size=medium&pid=10200&avatarId=10011",
+				"48x48":"https://yourjira.instance.com/secure/projectavatar?pid=10200&avatarId=10011"
+			}
+		},
+		"versions":[],
+		"environment":null,
+		"timeestimate":null,
+		"aggregateprogress":{
+			"progress":0,
+			"total":0
+		},
+		"lastViewed":"2015-09-24T16:44:46.910+0200",
+		"components":[],
+		"customfield_10010":null,
+		"timeoriginalestimate":null,
+		"aggregatetimespent":null
+	}
+}

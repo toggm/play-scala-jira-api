@@ -1,0 +1,12 @@
+{
+	"self":"https://yourjira.instance.com/rest/api/2/project/10070",
+	"id":"10070",
+	"key":"MMPDC",
+	"name":"android-mmpdc",
+	"avatarUrls":{
+		"16x16":"https://yourjira.instance.com/secure/projectavatar?size=xsmall&pid=10070&avatarId=10011",
+		"24x24":"https://yourjira.instance.com/secure/projectavatar?size=small&pid=10070&avatarId=10011",
+		"32x32":"https://yourjira.instance.com/secure/projectavatar?size=medium&pid=10070&avatarId=10011",
+		"48x48":"https://yourjira.instance.com/secure/projectavatar?pid=10070&avatarId=10011"
+	}
+}

@@ -111,7 +111,7 @@ object JiraWSHelper {
   implicit class JiraWS(self: WSRequestHolder) {
 
     def withJiraCredentials(implicit auth: JiraAuthentication): WSRequestHolder = {
-      self.withHeaders(headers).withRequestTimeout(10000)
+      self.withHeaders(headers: _*).withRequestTimeout(10000)
     }
 
     def headers(implicit auth: JiraAuthentication) = {
@@ -124,9 +124,9 @@ object JiraWSHelper {
         case OAuthAuthentication(token) =>
           ("oauth_token" -> token)
       }
-      Seq(h1, h2): _*
+      Seq(h1, h2)
     }
   }
 }
 
-object JiraApiServiceImpl extends JiraApiServiceImpl
+//object JiraApiServiceImpl extends JiraApiServiceImpl

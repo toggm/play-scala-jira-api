@@ -1,0 +1,6 @@
+{
+	"expand":"editmeta,renderedFields,transitions,changelog,operations",
+	"id":"11720",
+	"self":"https://yourjira.instance.com/rest/api/2/issue/11720",
+	"key":"LAS-37"
+}

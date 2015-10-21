@@ -8,7 +8,7 @@ import play.api.libs.functional.syntax._
 import models.BaseFormats._
 
 case class JiraAvatarUrls(`16x16`: String, `24x24`: String, `32x32`: String, `48x48`: String)
-case class JiraProject(self: URI, id: String, key: String, name: String, avatarUrls: JiraAvatarUrls)
+case class JiraProject(self: URI, id: String, key: String, name: String, avatarUrls: Option[JiraAvatarUrls])
 case class JiraIssueType(self: URI, id: String, description: String, iconUrl: String, name: String, subtask: Boolean)
 case class JiraVotes(self: URI, votes: Number, hasVoted: Boolean)
 case class JiraFixVersion(self: URI, id: String, description: String, name: String, archived: Boolean, released: Boolean)

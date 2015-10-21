@@ -19,6 +19,7 @@ import org.apache.http.HttpStatus
 import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
 import play.api.libs.json.Reads
+import play.api.libs.ws.WSRequest
 
 trait JiraApiService {
 
@@ -108,9 +109,9 @@ trait JiraApiServiceImpl extends JiraApiService {
 }
 
 object JiraWSHelper {
-  implicit class JiraWS(self: WSRequestHolder) {
+  implicit class JiraWS(self: WSRequest) {
 
-    def withJiraCredentials(implicit auth: JiraAuthentication): WSRequestHolder = {
+    def withJiraCredentials(implicit auth: JiraAuthentication): WSRequest = {
       self.withHeaders(headers: _*).withRequestTimeout(10000)
     }
 
@@ -119,7 +120,8 @@ object JiraWSHelper {
       val h2 = auth match {
         case BasicAuthentication(user, pwd) =>
           val pair = s"$user:$pwd"
-          val enc = "Basic " + Base64.encodeBase64(pair.getBytes("utf-8"))
+          val encPart = new String(Base64.encodeBase64(pair.getBytes("utf-8")), "utf-8")
+          val enc = s"Basic $encPart"
           ("Authorization" -> enc)
         case OAuthAuthentication(token) =>
           ("oauth_token" -> token)

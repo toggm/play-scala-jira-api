@@ -26,7 +26,7 @@ class JIRAAPIServiceSpec extends Specification {
       val expand = "sadfasdf"
 
       Server.withRouter() {
-        case GET(p"/rest/api/2/project?sadfasdf") => Action {
+        case GET(p"/rest/api/2/project") => Action {
           Results.Ok(Json.arr(Json.obj("self" -> "http://test.com", "id" -> "1", "key" -> "proj1", "name" -> "projname")))
         }
       } { implicit port =>
@@ -35,7 +35,7 @@ class JIRAAPIServiceSpec extends Specification {
           val result = Await.result(
             service.getAllProjects(expand), 10.seconds)
 
-          result.size === Seq(JiraProject(new URI("http://test.com"), "1", "proj1", "projname", None))
+          result === Seq(JiraProject(new URI("http://test.com"), "1", "proj1", "projname", None))
         }
       }
     }

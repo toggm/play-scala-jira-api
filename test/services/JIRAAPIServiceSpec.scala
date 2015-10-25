@@ -6,7 +6,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import play.api.test._
 import play.api.routing.sird._
-import models.JiraProject
+import models._
 import java.net.URI
 import play.core.server.Server
 import play.api.test.WsTestClient
@@ -17,12 +17,32 @@ import play.api.libs.ws.WSClient
 case class JiraApiServiceMock(ws: WSClient, config: JiraConfiguration) extends JiraApiServiceImpl
 
 class JIRAAPIServiceSpec extends Specification {
-  "getAllProjects" should {
-    implicit val auth = OAuthAuthentication("123")
-    implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
-    val config = JiraConfiguration("")
+  implicit val auth = OAuthAuthentication("123")
+  val config = JiraConfiguration("")
+  implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-    "get correct result with expand" in {
+  "getProjectVersions" should {
+
+    "get correct result" in {
+      val projectId = "123"
+
+      Server.withRouter() {
+        case GET(p"/rest/api/2/project/123/version") => Action {
+          Results.Ok(Json.arr(Json.obj("self" -> "http://test.com", "id" -> "1", "description" -> "version1", "name" -> "1.0", "archived" -> false, "released" -> true)))
+        }
+      } { implicit port =>
+        WsTestClient.withClient { implicit client =>
+          val service = JiraApiServiceMock(client, config)
+          val result = Await.result(
+            service.getProjectVersions(projectId), 10.seconds)
+          result === Seq(JiraVersion(new URI("http://test.com"), "1", "version1", "1.0", false, true))
+        }
+      }
+    }
+  }
+  "getAllProjects" should {
+
+    "get correct result" in {
       val expand = "sadfasdf"
 
       Server.withRouter() {
@@ -40,4 +60,5 @@ class JIRAAPIServiceSpec extends Specification {
       }
     }
   }
+
 }

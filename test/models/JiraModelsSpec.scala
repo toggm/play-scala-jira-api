@@ -73,13 +73,20 @@ class JiraModelsSpec extends Specification with JsonMatchers {
       val result = s.mkString
 
       val json = Json.parse(result)
-      println(json)
       val opt = Json.fromJson[JiraIssue](json).asOpt
-      println(opt)
       opt must not be None
 
       val issue = opt.get
       issue.id === "11720"
+    }
+
+    "parse jira version correctly" in {
+      val json = Json.obj("self" -> "http://test.com", "id" -> "1", "description" -> "version1", "name" -> "1.0", "archived" -> false, "released" -> true)
+      val opt = Json.fromJson[JiraVersion](json).asOpt
+      opt must not be None
+
+      val issue = opt.get
+      issue.id === "1"
     }
   }
 

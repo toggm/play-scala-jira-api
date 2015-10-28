@@ -61,4 +61,44 @@ class JIRAAPIServiceSpec extends Specification {
     }
   }
 
+  "getVersions" should {
+
+    "get correct result" in {
+      val projectId = "123"
+
+      Server.withRouter() {
+        case GET(p"/rest/api/2/project/123/versions") => Action {
+          Results.Ok(Json.arr(Json.obj("self" -> "http://test.com", "id" -> "1", "description" -> "version1", "name" -> "1.0", "archived" -> false, "released" -> true)))
+        }
+      } { implicit port =>
+        WsTestClient.withClient { implicit client =>
+          val service = JiraApiServiceMock(client, config)
+          val result = Await.result(
+            service.getVersions(projectId, ""), 10.seconds)
+          result === Seq(JiraVersion(new URI("http://test.com"), "1", "version1", "1.0", false, true))
+        }
+      }
+    }
+  }
+
+  "findIssues" should {
+
+    "get correct result" in {
+      val jql = "key='123'"
+
+      Server.withRouter() {
+        case GET(p"/rest/api/2/search") => Action {
+          Results.Ok(Json.arr(Json.obj("self" -> "http://test.com", "id" -> "1", "key" -> "123")))
+        }
+      } { implicit port =>
+        WsTestClient.withClient { implicit client =>
+          val service = JiraApiServiceMock(client, config)
+          val result = Await.result(
+            service.findIssues(jql), 10.seconds)
+          result === Seq(JiraIssue(id = "1", self = new URI("http://test.com"), key = "123"))
+        }
+      }
+    }
+  }
+
 }

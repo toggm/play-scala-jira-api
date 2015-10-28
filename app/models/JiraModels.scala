@@ -67,7 +67,7 @@ case class JiraIssueFields(
   secondary: SecondaryJiraIssueFields,
   ref: SelfReferenceJiraIssueFields)
 
-case class JiraIssue(expand: Option[String], id: String, self: URI, key: String, fields: Option[JiraIssueFields])
+case class JiraIssue(expand: Option[String] = None, id: String, self: URI, key: String, fields: Option[JiraIssueFields] = None)
 case class JiraIssueLink(id: String, self: URI, `type`: Option[JiraLinkType], inwardIssue: Option[JiraIssue])
 case class JiraSearchResult(expand: String, startAt: Int, maxResults: Int, total: Int, issues: Seq[JiraIssue])
 

@@ -1,0 +1,7 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# oauth services
+POST      /oauth/requestToken                    controllers.OAuthController.requestToken(baseUrl:String, consumerKey:String,publicKey:String, callbackUrl:String) 
+POST      /oauth/accessToken                     controllers.OAuthController.accessToken(baseUrl:String, consumerKey:String,publicKey:String, requestToken:String, tokenSecret:String)

@@ -21,6 +21,10 @@ trait OAuthController {
     implicit val requestTokenFormat: Format[OAuthRequestToken] = Json.format[OAuthRequestToken]
     implicit val accessTokenFormat: Format[OAuthAccessToken] = Json.format[OAuthAccessToken]
     
+    def index = Action {
+      Ok(views.html.oauth())
+    }
+    
     def obtainRequestToken(baseUrl:String, consumerKey:String, publicKey:String, callbackUrl: String) = Action {
       requst => 
 
@@ -56,3 +60,5 @@ trait OAuthController {
           true)
     }
 }
+
+object OAuthController extends OAuthController with Controller

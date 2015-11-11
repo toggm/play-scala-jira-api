@@ -1,0 +1,19 @@
+@()
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>OAuth token generation page</title>
+    </head>
+    <body>
+        <h1>Obtain request token</h1>        
+        <form action="/oauth/requestToken" method="POST">
+        	<input type="text" name="baseUrl" placeholder="Jira base URL..." /><br />
+        	<textarea rows="5" cols="50" name="consumerKey"></textarea><br />
+        	<input type="text" name="publicKey" placeholder="Public Key..." /><br /> 
+        	<input type="text" name="callbackUrl" placeholder="Callback URL..." /><br />
+        	<button type="submit">Obtain Request Token</button>       	
+        </form>
+    </body>
+</html>

@@ -1,13 +1,13 @@
 package models
 
 import org.specs2.mutable._
+
 import org.specs2.mutable.Specification
 import org.specs2.runner._
 import scala.io.Source
 import play.api.libs.json.Json
-import org.specs2.matcher.JsonMatchers
 
-class JiraModelsSpec extends Specification with JsonMatchers {
+class JiraModelsSpec extends Specification {
   "JSON Result" should {
     "parse jira issue correctly" in {
       val s = Source.fromFile("test/resources/jira_issue.json")

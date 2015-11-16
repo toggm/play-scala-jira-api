@@ -1,4 +1,6 @@
-@()
+@import helper._
+@import controllers.OAuthController
+@(requestTokenForm: Form[OAuthController.RequestTokenData], accessTokenForm: Form[OAuthController.AccessTokenData])(implicit messages: Messages)
 
 <!DOCTYPE html>
 
@@ -7,13 +9,39 @@
         <title>OAuth token generation page</title>
     </head>
     <body>
-        <h1>Obtain request token</h1>        
-        <form action="/oauth/requestToken" method="POST">
-        	<input type="text" name="baseUrl" placeholder="Jira base URL..." /><br />
-        	<textarea rows="5" cols="50" name="consumerKey"></textarea><br />
-        	<input type="text" name="publicKey" placeholder="Public Key..." /><br /> 
-        	<input type="text" name="callbackUrl" placeholder="Callback URL..." /><br />
-        	<button type="submit">Obtain Request Token</button>       	
-        </form>
+        <h1>Obtain request token</h1>
+        @if(requestTokenForm.hasGlobalErrors) {
+		  <ul>
+		  @for(error <- requestTokenForm.globalErrors) {
+		    <li>@error.message</li>
+		  }
+		  </ul>
+		}
+		@helper.form(action = routes.OAuthController.obtainRequestToken) {
+		  @helper.inputText(requestTokenForm("baseUrl"))
+		  @helper.inputText(requestTokenForm("consumerKey"))
+		  @helper.textarea(requestTokenForm("privateKey"))
+		  @helper.inputText(requestTokenForm("callbackUrl"))
+		  <button type="submit">Obtain Request Token</button>
+		}
+		
+		<h1>Obtain access token</h1>
+        @if(accessTokenForm.hasGlobalErrors) {
+		  <ul>
+		  @for(error <- accessTokenForm.globalErrors) {
+		    <li>@error.message</li>
+		  }
+		  </ul>
+		}
+		@helper.form(action = routes.OAuthController.obtainAccessToken) {
+		  @helper.inputText(accessTokenForm("baseUrl"))
+		  @helper.inputText(accessTokenForm("consumerKey"))
+		  @helper.textarea(accessTokenForm("privateKey"))
+		  @helper.inputText(accessTokenForm("requestToken"))
+		  @helper.inputText(accessTokenForm("tokenSecret"))
+		  @helper.inputText(accessTokenForm("verifier"))
+		  <button type="submit">Obtain Access Token</button>
+		}             
+        
     </body>
 </html>

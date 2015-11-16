@@ -4,5 +4,5 @@
 
 # oauth services
 GET		  /oauth								 controllers.OAuthController.index
-POST      /oauth/requestToken                    controllers.OAuthController.obtainRequestToken(baseUrl:String, consumerKey:String,publicKey:String, callbackUrl:String) 
-POST      /oauth/accessToken                     controllers.OAuthController.obtainAccessToken(baseUrl:String, consumerKey:String,publicKey:String, requestToken:String, tokenSecret:String, verifier:String)
+POST      /oauth/requestToken                    controllers.OAuthController.obtainRequestToken 
+POST      /oauth/accessToken                     controllers.OAuthController.obtainAccessToken

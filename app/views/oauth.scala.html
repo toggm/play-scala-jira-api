@@ -1,14 +1,8 @@
-@import helper._
-@import controllers.OAuthController
-@(requestTokenForm: Form[OAuthController.RequestTokenData], accessTokenForm: Form[OAuthController.AccessTokenData])(implicit messages: Messages)
+@(requestTokenForm: Form[RequestTokenData])(implicit messages: Messages)
 
-<!DOCTYPE html>
+@implicitFC = @{ b3.horizontal.fieldConstructor("col-md-4", "col-md-8") }
 
-<html>
-    <head>
-        <title>OAuth token generation page</title>
-    </head>
-    <body>
+@main("OAuth token generation page"){
         <h1>Obtain request token</h1>
         @if(requestTokenForm.hasGlobalErrors) {
 		  <ul>
@@ -17,31 +11,12 @@
 		  }
 		  </ul>
 		}
-		@helper.form(action = routes.OAuthController.obtainRequestToken) {
-		  @helper.inputText(requestTokenForm("baseUrl"))
-		  @helper.inputText(requestTokenForm("consumerKey"))
-		  @helper.textarea(requestTokenForm("privateKey"))
-		  @helper.inputText(requestTokenForm("callbackUrl"))
-		  <button type="submit">Obtain Request Token</button>
-		}
+		@b3.form(action = routes.OAuthController.obtainRequestTokenForm) {
 		
-		<h1>Obtain access token</h1>
-        @if(accessTokenForm.hasGlobalErrors) {
-		  <ul>
-		  @for(error <- accessTokenForm.globalErrors) {
-		    <li>@error.message</li>
-		  }
-		  </ul>
+		  @b3.text(requestTokenForm("baseUrl"), '_label -> "Base URL", 'placeholder -> "Base URL of Jira instance...")
+		  @b3.text(requestTokenForm("consumerKey"), '_label -> "Consumer key", 'placeholder -> "Shared consumer key...")
+		  @b3.textarea(requestTokenForm("privateKey"), '_label -> "Private key", 'placeholder -> "Private RSA key, including start and end tags...", 'rows -> 10)
+		  @b3.text(requestTokenForm("callbackUrl"), '_label -> "Callback URL", 'placeholder -> "Some dummy callback URL...")
+		  @b3.submit('class -> "btn btn-default"){ Obtain Request Token }
 		}
-		@helper.form(action = routes.OAuthController.obtainAccessToken) {
-		  @helper.inputText(accessTokenForm("baseUrl"))
-		  @helper.inputText(accessTokenForm("consumerKey"))
-		  @helper.textarea(accessTokenForm("privateKey"))
-		  @helper.inputText(accessTokenForm("requestToken"))
-		  @helper.inputText(accessTokenForm("tokenSecret"))
-		  @helper.inputText(accessTokenForm("verifier"))
-		  <button type="submit">Obtain Access Token</button>
-		}             
-        
-    </body>
-</html>
+}		       

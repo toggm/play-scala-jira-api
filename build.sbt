@@ -8,11 +8,13 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.11.7"
 
-resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/releases"
+resolvers += "Sonatype OSS Releases" at "https://oss.sonatype.org/content/repositories/releases"
 
 resolvers += "scalaz-bintray" at "http://dl.bintray.com/scalaz/releases"
 
 resolvers += "oauth" at "http://oauth.googlecode.com/svn/code/maven/"
+
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 
 libraryDependencies ++= Seq(
   specs2 % Test,
@@ -20,6 +22,8 @@ libraryDependencies ++= Seq(
   "commons-codec" % "commons-codec" % "1.6",
   //"net.oauth.core" % "oauth" % "20100527",
   "net.oauth.core" % "oauth-httpclient4" % "20090913",
+  "com.adrianhurt" %% "play-bootstrap3" % "0.4.5-P24-SNAPSHOT",
+  "org.webjars" % "font-awesome" % "4.3.0-2",
   cache,
   ws
 )

@@ -1,0 +1,28 @@
+@(url: String, accessTokenForm: Form[AccessTokenData])(implicit messages: Messages)
+
+
+@implicitFC = @{ b3.horizontal.fieldConstructor("col-md-4", "col-md-8") }
+
+@main("Step 2. generate access token") {
+		<h1>Obtain access token</h1>
+		<p>Visit <a href="@url" target="_new">Validation URL</a>, login with the username to map this service against. After successful login, fetch validator from redirected URL
+		</p>
+		
+        @if(accessTokenForm.hasGlobalErrors) {
+		  <ul>
+		  @for(error <- accessTokenForm.globalErrors) {
+		    <li>@error.message</li>
+		  }
+		  </ul>
+		}
+		@b3.form(action = routes.OAuthController.obtainAccessTokenForm) {
+		
+		  @b3.text(accessTokenForm("baseUrl"),'readonly -> "readonly",  'class -> "disabled", 'label -> "Base URL")
+		  @b3.text(accessTokenForm("consumerKey"),'readonly -> "readonly", 'class -> "disabled", 'label -> "Consumer key")
+		  @b3.textarea(accessTokenForm("privateKey"),'readonly -> "readonly", 'class -> "disabled", 'label -> "Private key", 'rows -> 10)
+		  @b3.text(accessTokenForm("requestToken"),'readonly -> "readonly", 'class -> "disabled", 'label -> "Request token")
+		  @b3.text(accessTokenForm("tokenSecret"),'readonly -> "readonly", 'class -> "disabled", 'label -> "Token secret")
+		  @b3.text(accessTokenForm("verifier"), 'label -> "Verifier", 'placeholder -> "Verifier obtained from Jira redirect URL...")
+		  @b3.submit('class -> "btn btn-default"){ Obtain Access Token }		  
+		}             
+}        

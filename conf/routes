@@ -4,5 +4,12 @@
 
 # oauth services
 GET		  /oauth								 controllers.OAuthController.index
-POST      /oauth/requestToken                    controllers.OAuthController.obtainRequestToken 
-POST      /oauth/accessToken                     controllers.OAuthController.obtainAccessToken
+
+POST      /oauth/requestTokenForm                controllers.OAuthController.obtainRequestTokenForm 
+POST      /oauth/accessTokenForm                 controllers.OAuthController.obtainAccessTokenForm
+
+POST      /oauth/requestToken/json                controllers.OAuthController.obtainRequestTokenJson 
+POST      /oauth/accessToken/json                 controllers.OAuthController.obtainAccessTokenJson
+
+# Map static resources from the /public folder to the /assets URL path
+GET		/assets/*file			controllers.Assets.at(path="/public", file)

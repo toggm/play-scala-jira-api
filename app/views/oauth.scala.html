@@ -3,7 +3,7 @@
 @implicitFC = @{ b3.horizontal.fieldConstructor("col-md-4", "col-md-8") }
 
 @main("OAuth token generation page"){
-        <h1>Obtain request token</h1>
+        <h2>Obtain request token</h2>
         @if(requestTokenForm.hasGlobalErrors) {
 		  <ul>
 		  @for(error <- requestTokenForm.globalErrors) {

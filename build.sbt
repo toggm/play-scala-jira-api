@@ -20,6 +20,7 @@ libraryDependencies ++= Seq(
   specs2 % Test,
   "org.julienrf" %% "play-json-variants" % "1.0.0",
   "commons-codec" % "commons-codec" % "1.6",
+  "org.scala-lang.modules" %% "scala-async" % "0.9.2",
   //"net.oauth.core" % "oauth" % "20100527",
   "net.oauth.core" % "oauth-httpclient4" % "20090913",
   "com.adrianhurt" %% "play-bootstrap3" % "0.4.5-P24-SNAPSHOT",

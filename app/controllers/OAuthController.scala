@@ -23,6 +23,7 @@ import scala.util.Try
 import scala.util.Success
 import scala.util.Failure
 import scala.concurrent.Future
+import utils.OAuthUtil
 
 case class OAuthRequestToken(token:String, tokenSecret:String, verifier: String, accessTokenUrl:String)
 case class OAuthAccessToken(accessToken:String)
@@ -113,7 +114,7 @@ object OAuthController extends Controller {
           val oAuthClient = new OAuthClient(new HttpClient4())
           val callBack = callbackParam(data.callbackUrl)
 
-          val accessor = getAccessor(data.baseUrl, data.consumerKey, data.privateKey, data.callbackUrl)
+          val accessor = OAuthUtil.getAccessor(data.baseUrl, data.consumerKey, data.privateKey, data.callbackUrl)
           val message = oAuthClient.getRequestTokenResponse(accessor, "POST", callBack.toList)
           
           val token = accessor.requestToken;
@@ -164,7 +165,7 @@ object OAuthController extends Controller {
     
     def obtainAccessToken(data:AccessTokenData):Try[OAuthAccessToken] =  {
           try {
-            val accessor = getAccessor(data.baseUrl, data.consumerKey, data.privateKey, "");
+            val accessor = OAuthUtil.getAccessor(data.baseUrl, data.consumerKey, data.privateKey, "");
             val client = new OAuthClient(new HttpClient4());
             accessor.requestToken = data.requestToken;
             accessor.tokenSecret = data.tokenSecret;
@@ -177,14 +178,6 @@ object OAuthController extends Controller {
               Logger.warn("Didn't obtain access token", e)
               Failure(e)
           }        
-    }
-    
-     def getAccessor(baseUrl:String, consumerKey:String, privateKey:String, callback:String):OAuthAccessor = {
-        val serviceProvider = new OAuthServiceProvider(baseUrl + "/plugins/servlet/oauth/request-token", baseUrl + "/plugins/servlet/oauth/authorize", baseUrl + "/plugins/servlet/oauth/access-token");
-        val consumer = new OAuthConsumer(callback, consumerKey, null, serviceProvider);
-        consumer.setProperty(RSA_SHA1.PRIVATE_KEY, privateKey);
-        consumer.setProperty(OAuth.OAUTH_SIGNATURE_METHOD, OAuth.RSA_SHA1);
-        new OAuthAccessor(consumer);
-    }
+    }    
 }
 

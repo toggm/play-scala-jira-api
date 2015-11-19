@@ -20,6 +20,17 @@ import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext
 import play.api.libs.json.Reads
 import play.api.libs.ws.WSRequest
+import play.api.mvc.Request
+import utils.OAuthUtil
+import net.oauth.client.OAuthClient
+import net.oauth.client.httpclient4.HttpClient4
+import play.api.libs.json.JsValue
+import scala.util.Failure
+import scala.util.Success
+import scala.util.Success
+import org.apache.http.HttpException
+import java.io.IOException
+import scala.util.Failure
 
 trait JiraApiService {
 
@@ -48,7 +59,7 @@ trait JiraApiService {
 
 sealed trait JiraAuthentication
 case class BasicAuthentication(username: String, password: String) extends JiraAuthentication
-case class OAuthAuthentication(token: String) extends JiraAuthentication
+case class OAuthAuthentication(consumerKey:String, token: String) extends JiraAuthentication
 
 case class JiraConfiguration(baseUrl: String)
 
@@ -87,48 +98,63 @@ trait JiraApiServiceImpl extends JiraApiService {
 
   def getList[T](relUrl: String)(implicit auth: JiraAuthentication, executionContext: ExecutionContext, reads: Reads[T]): Future[Seq[T]] = {
     val url = config.baseUrl + relUrl
-    ws.url(url).withJiraCredentials.get.map { resp =>
-      Logger.debug(s"Called api url:$relUrl => Status=${resp.status}:${resp.statusText}, Headers:${resp.allHeaders}")
-      resp.status match {
-        case HttpStatus.SC_OK => Json.fromJson[Seq[T]](resp.json).asOpt.getOrElse(Nil)
-        case _ => Nil
-      }
-    }
+    JiraWSHelper.call(config, url, ws).map { _ match {
+      case Success(json) => Json.fromJson[Seq[T]](json).asOpt.getOrElse(Nil)
+      case Failure(e) => Nil
+    }}    
   }
 
   def getOption[T](relUrl: String)(implicit auth: JiraAuthentication, executionContext: ExecutionContext, reads: Reads[T]): Future[Option[T]] = {
     val url = config.baseUrl + relUrl
-    ws.url(url).withJiraCredentials.get.map { resp =>
-      Logger.debug(s"Called api url:$relUrl => Status=${resp.status}:${resp.statusText}, Headers:${resp.allHeaders}")
-      resp.status match {
-        case HttpStatus.SC_OK => Json.fromJson[T](resp.json).asOpt
-        case _ => None
-      }
-    }
+    JiraWSHelper.call(config, url, ws).map { _ match {
+      case Success(json) => Json.fromJson[T](json).asOpt
+      case Failure(e) => None
+    }}
   }
 }
 
 object JiraWSHelper {
-  implicit class JiraWS(self: WSRequest) {
-
-    def withJiraCredentials(implicit auth: JiraAuthentication): WSRequest = {
-      self.withHeaders(headers: _*).withRequestTimeout(10000)
-    }
-
-    def headers(implicit auth: JiraAuthentication) = {
-      val h1 = ("Content-Type" -> "application/json")
-      val h2 = auth match {
-        case BasicAuthentication(user, pwd) =>
-          val pair = s"$user:$pwd"
-          val encPart = new String(Base64.encodeBase64(pair.getBytes("utf-8")), "utf-8")
-          val enc = s"Basic $encPart"
-          ("Authorization" -> enc)
-        case OAuthAuthentication(token) =>
-          ("oauth_token" -> token)
+  import scala.async.Async.{async, await}
+      
+    def call(config:JiraConfiguration, url:String, ws:WSClient)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Try[JsValue]] = {
+      auth match {
+        case oauth: OAuthAuthentication =>
+          callWithOAuth(config, url, oauth)
+        case basicAuth: BasicAuthentication => 
+          callWithBasicAuth(config, url, ws, basicAuth)
       }
-      Seq(h1, h2)
     }
-  }
+    
+    def callWithOAuth(config:JiraConfiguration, url:String, auth:OAuthAuthentication)(implicit executionContext: ExecutionContext):Future[Try[JsValue]] = {
+      async{
+        try {
+          val accessor = OAuthUtil.getAccessor(config.baseUrl, auth.consumerKey, "", "")
+           val client = new OAuthClient(new HttpClient4());
+           val response = client.invoke(accessor, url, java.util.Collections.emptySet())       
+           Success(Json.parse(response.readBodyAsString()))
+        }
+        catch {
+          case e:Exception => Failure(e)
+        }
+      }
+    }
+    
+    def callWithBasicAuth(config:JiraConfiguration, url:String, ws:WSClient, auth:BasicAuthentication)(implicit executionContext: ExecutionContext): Future[Try[JsValue]] = {
+      val pair = s"${auth.username}:${auth.password}"
+      val encPart = new String(Base64.encodeBase64(pair.getBytes("utf-8")), "utf-8")
+      val enc = s"Basic $encPart"
+      
+      ws.url(url).withHeaders((headers :+ ("Authorization" -> enc)) : _*).get.map {resp =>
+        resp.status match {
+          case HttpStatus.SC_OK => Success(resp.json)
+          case error => Failure(new IOException(s"Http status:$error"))
+        }
+      }
+    }
+
+    def headers() = {
+      Seq(("Content-Type" -> "application/json"))
+    }  
 }
 
 //object JiraApiServiceImpl extends JiraApiServiceImpl

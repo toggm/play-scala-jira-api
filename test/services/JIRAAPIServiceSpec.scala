@@ -17,7 +17,7 @@ import play.api.libs.ws.WSClient
 case class JiraApiServiceMock(ws: WSClient, config: JiraConfiguration) extends JiraApiServiceImpl
 
 class JIRAAPIServiceSpec extends Specification {
-  implicit val auth = OAuthAuthentication("123")
+  implicit val auth = BasicAuthentication("key", "123")
   val config = JiraConfiguration("")
   implicit val context = play.api.libs.concurrent.Execution.Implicits.defaultContext
 

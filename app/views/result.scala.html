@@ -1,8 +1,12 @@
-@(accessToken: String)
+@(baseUrl: String, consumerKey:String, privateKey:String, accessToken: String)
 
 
 @main("Step 3. Result") {
 		<h2>Access Token</h2>
 		
 		<div class="alert alert-success" role="alert">Your access token is: <b>@accessToken</b></div>
+		
+		<p>Test Access Token querying 
+		<a href='@routes.OAuthController.showRequestForm(baseUrl, consumerKey, privateKey, accessToken)'>your Jira instance</a>
+		</p>
 }

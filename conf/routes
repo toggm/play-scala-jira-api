@@ -7,6 +7,8 @@ GET		  /oauth								 controllers.OAuthController.index
 
 POST      /oauth/requestTokenForm                controllers.OAuthController.obtainRequestTokenForm 
 POST      /oauth/accessTokenForm                 controllers.OAuthController.obtainAccessTokenForm
+GET      /oauth/requestForm                      controllers.OAuthController.showRequestForm(baseUrl:String?="", consumerKey:String?="", privateKey:String?="", accessToken:String?="")
+POST      /oauth/projects                    	 controllers.OAuthController.queryProjects
 
 POST      /oauth/requestToken/json                controllers.OAuthController.obtainRequestTokenJson 
 POST      /oauth/accessToken/json                 controllers.OAuthController.obtainAccessTokenJson

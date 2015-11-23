@@ -59,7 +59,7 @@ trait JiraApiService {
 
 sealed trait JiraAuthentication
 case class BasicAuthentication(username: String, password: String) extends JiraAuthentication
-case class OAuthAuthentication(consumerKey:String, token: String) extends JiraAuthentication
+case class OAuthAuthentication(consumerKey:String, privateKey:String, token: String) extends JiraAuthentication
 
 case class JiraConfiguration(baseUrl: String)
 
@@ -75,8 +75,9 @@ trait JiraApiServiceImpl extends JiraApiService {
   val ws: WSClient
   val config: JiraConfiguration
 
-  def getAllProjects(expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraProject]] = {
+  def getAllProjects(expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraProject]] = {    
     val url = allProjectsUrl.format(expand)
+    Logger.debug(s"getAllProjects(expand:$expand, url:$url")
     getList[JiraProject](url)
   }
 
@@ -98,17 +99,27 @@ trait JiraApiServiceImpl extends JiraApiService {
 
   def getList[T](relUrl: String)(implicit auth: JiraAuthentication, executionContext: ExecutionContext, reads: Reads[T]): Future[Seq[T]] = {
     val url = config.baseUrl + relUrl
-    JiraWSHelper.call(config, url, ws).map { _ match {
-      case Success(json) => Json.fromJson[Seq[T]](json).asOpt.getOrElse(Nil)
-      case Failure(e) => Nil
+    Logger.debug(s"getList(url:$url")
+    JiraWSHelper.call(config, url, ws).flatMap { _ match {
+      case Success(json) => 
+        Logger.debug(s"getList:Success -> $json")
+        Json.fromJson[Seq[T]](json).asOpt.map(j => Future.successful(j)).getOrElse(Future.failed(new RuntimeException(s"Could not parse $json")))
+      case Failure(e) =>
+        Logger.debug(s"getList:Failure -> $e")
+        Future.failed(e)
     }}    
   }
 
   def getOption[T](relUrl: String)(implicit auth: JiraAuthentication, executionContext: ExecutionContext, reads: Reads[T]): Future[Option[T]] = {
     val url = config.baseUrl + relUrl
-    JiraWSHelper.call(config, url, ws).map { _ match {
-      case Success(json) => Json.fromJson[T](json).asOpt
-      case Failure(e) => None
+    Logger.debug(s"getOption(url:$url")
+    JiraWSHelper.call(config, url, ws).flatMap { _ match {
+      case Success(json) =>
+        Logger.debug(s"getOption:Success -> $json")
+        Json.fromJson[T](json).asOpt.map(j => Future.successful(Some(j))).getOrElse(Future.failed(new RuntimeException(s"Could not parse $json")))
+      case Failure(e) =>
+        Logger.debug(s"getOption:Failure -> $e")
+        Future.failed(e)
     }}
   }
 }
@@ -128,7 +139,7 @@ object JiraWSHelper {
     def callWithOAuth(config:JiraConfiguration, url:String, auth:OAuthAuthentication)(implicit executionContext: ExecutionContext):Future[Try[JsValue]] = {
       async{
         try {
-          val accessor = OAuthUtil.getAccessor(config.baseUrl, auth.consumerKey, "", "")
+          val accessor = OAuthUtil.getAccessor(config.baseUrl, auth.consumerKey, auth.privateKey, "")
            val client = new OAuthClient(new HttpClient4());
            val response = client.invoke(accessor, url, java.util.Collections.emptySet())       
            Success(Json.parse(response.readBodyAsString()))

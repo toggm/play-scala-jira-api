@@ -6,7 +6,6 @@ import java.net.URL
 import play.api.mvc.Action
 import play.api.libs.json._
 import play.api.libs.oauth.RequestToken
-import play.api.libs.oauth.RequestToken
 import play.api.Logger
 import play.api.data._
 import play.api.data.Forms._
@@ -24,11 +23,19 @@ import scala.util.Success
 import scala.util.Failure
 import scala.concurrent.Future
 import utils.OAuthUtil
+import services.JiraConfiguration
+import services.JiraApiServiceImpl
+import play.api.libs.ws.WSClient
+import play.api.libs.ws.WS
+import services.JiraConfiguration
+import services.OAuthAuthentication
+import scala.concurrent.ExecutionContext.Implicits.global
 
 case class OAuthRequestToken(token:String, tokenSecret:String, verifier: String, accessTokenUrl:String)
 case class OAuthAccessToken(accessToken:String)
 case class RequestTokenData(baseUrl:String, consumerKey:String, privateKey:String, callbackUrl: String)
 case class AccessTokenData(baseUrl:String, consumerKey:String, privateKey:String, requestToken: String, tokenSecret:String, verifier:String)
+case class RequestData(baseUrl: String, consumerKey:String, privateKey:String, accessToken:String)
     
 
 object OAuthController extends Controller {
@@ -57,7 +64,14 @@ object OAuthController extends Controller {
         "verifier" -> text
       )(AccessTokenData.apply)(AccessTokenData.unapply)
     )
-
+    val requestForm = Form(
+        mapping(
+        "baseUrl" -> text,
+        "consumerKey" -> text,
+        "privateKey" -> text,
+        "accessToken" -> text
+      )(RequestData.apply)(RequestData.unapply)
+    )
     
     def index = Action {
       Ok(views.html.oauth(requestTokenForm))
@@ -83,7 +97,7 @@ object OAuthController extends Controller {
               BadRequest(e.getMessage)
           }
     }.recoverTotal{
-      e => BadRequest("Detected error:"+ JsError.toFlatJson(e))
+      e => BadRequest("Detected error:"+ JsError.toJson(e))
     }      
     }
     
@@ -143,7 +157,7 @@ object OAuthController extends Controller {
                 BadRequest(e.getMessage)
             }
       }.recoverTotal{
-        e => BadRequest("Detected error:"+ JsError.toFlatJson(e))
+        e => BadRequest("Detected error:"+ JsError.toJson(e))
       }                
     }
     
@@ -155,7 +169,7 @@ object OAuthController extends Controller {
         data => {
           obtainAccessToken(data) match {
             case Success(token) =>
-              Ok(views.html.result(token.accessToken))
+              Ok(views.html.result(data.baseUrl, data.consumerKey, data.privateKey, token.accessToken))
             case Failure(e) =>
               val formWithErrors = accessTokenForm.withError(FormError.apply("", e.getMessage))
               Ok(views.html.accessToken("", formWithErrors))
@@ -178,6 +192,30 @@ object OAuthController extends Controller {
               Logger.warn("Didn't obtain access token", e)
               Failure(e)
           }        
-    }    
+    }
+    
+    def showRequestForm(baseUrl:String, consumerKey:String, privateKey:String, accessToken: String) = Action {
+      val data = RequestData(baseUrl, consumerKey, privateKey, accessToken)
+      val form = requestForm.fill(data)
+      Ok(views.html.request(form))
+    }
+    
+    def queryProjects = Action.async {
+      implicit request =>
+        requestForm.bindFromRequest.fold(formWithErrors => {
+          Future.successful(Ok(views.html.request(formWithErrors)))
+        },
+        data => {
+          val service = new MyJiraApiServiceImpl(JiraConfiguration(data.baseUrl))
+          implicit val auth = OAuthAuthentication(data.consumerKey, data.privateKey, data.accessToken)
+          service.getAllProjects().map {proj => 
+            Ok(Json.toJson(proj))
+          }
+        })
+    }
+    
+    class MyJiraApiServiceImpl(override val config:JiraConfiguration) extends JiraApiServiceImpl {
+      override val ws: WSClient = WS.client
+    }
 }
 

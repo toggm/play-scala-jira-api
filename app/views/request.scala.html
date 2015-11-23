@@ -1,0 +1,22 @@
+@(form: Form[RequestData])(implicit messages: Messages)
+
+@implicitFC = @{ b3.horizontal.fieldConstructor("col-md-4", "col-md-8") }
+
+@main("Step 4. Verify connection") {
+		<h2>Send Test Request</h2>
+		@if(form.hasGlobalErrors) {
+		  <ul>
+		  @for(error <- form.globalErrors) {
+		    <li>@error.message</li>
+		  }
+		  </ul>
+		}
+		@b3.form(action = routes.OAuthController.queryProjects) {
+		
+		  @b3.text(form("baseUrl"), 'label -> "Base URL")
+		  @b3.text(form("consumerKey"), 'label -> "Consumer key")
+		  @b3.textarea(form("privateKey"), 'label -> "Private key", 'rows -> 10)
+		  @b3.text(form("accessToken"),'label -> "Access token")
+		  @b3.submit('class -> "btn btn-default"){ Query All Projects }		  
+		}
+}

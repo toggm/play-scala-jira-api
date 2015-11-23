@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules" %% "scala-async" % "0.9.2",
   //"net.oauth.core" % "oauth" % "20100527",
   "net.oauth.core" % "oauth-httpclient4" % "20090913",
-  "com.adrianhurt" %% "play-bootstrap3" % "0.4.5-P24-SNAPSHOT",
+  "com.adrianhurt" %% "play-bootstrap3" % "0.4.5-P24",
   "org.webjars" % "font-awesome" % "4.3.0-2",
   cache,
   ws

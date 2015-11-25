@@ -140,9 +140,10 @@ object JiraWSHelper {
       async{
         try {
           val accessor = OAuthUtil.getAccessor(config.baseUrl, auth.consumerKey, auth.privateKey, "")
-           val client = new OAuthClient(new HttpClient4());
-           val response = client.invoke(accessor, url, java.util.Collections.emptySet())       
-           Success(Json.parse(response.readBodyAsString()))
+          accessor.accessToken = auth.token
+          val client = new OAuthClient(new HttpClient4());
+          val response = client.invoke(accessor, url, java.util.Collections.emptySet())       
+          Success(Json.parse(response.readBodyAsString()))
         }
         catch {
           case e:Exception => Failure(e)

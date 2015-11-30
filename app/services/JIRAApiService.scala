@@ -12,7 +12,6 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Controller
 import play.api.mvc.Result
 import play.api.libs.ws.WSClient
-import play.api.libs.ws.WSRequestHolder
 import org.apache.commons.codec.binary.Base64
 import scala.concurrent.Future
 import org.apache.http.HttpStatus
@@ -31,30 +30,31 @@ import scala.util.Success
 import org.apache.http.HttpException
 import java.io.IOException
 import scala.util.Failure
+import java.net.URLEncoder
 
 trait JiraApiService {
 
   /**
    * Returns all projects which are visible for the currently logged in user. If no user is logged in, it returns the list of projects that are visible when using anonymous access.
    */
-  def getAllProjects(expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraProject]]
+  def getAllProjects(expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraProject]]
 
   /**
    * Returns all versions for the specified project. Results are paginated.
    */
-  def getProjectVersions(projectIdOrKey: String, startAt: Integer = 0, maxResults: Integer = 50,
-    orderBy: String = "", expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraVersion]]
+  def getProjectVersions(projectIdOrKey: String, startAt: Option[Integer]=None, maxResults: Option[Integer] = None,
+    orderBy: Option[String] = None, expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraVersion]]
 
   /**
    * Contains a full representation of a the specified project's versions.
    */
-  def getVersions(projectIdOrKey: String, expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraVersion]]
+  def getVersions(projectIdOrKey: String, expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraVersion]]
 
   /**
    * Searches for issues using JQL.
    */
-  def findIssues(jql: String, startAt: Integer = 0, maxResults: Integer = 50,
-    validateQuery: Boolean = true, fields: String = "*navigatable", expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraIssue]]
+  def findIssues(jql: String, startAt: Option[Integer] = None, maxResults: Option[Integer] = None,
+    validateQuery: Option[Boolean] = None, fields: Option[String] = Some("*navigatable"), expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraIssue]]
 }
 
 sealed trait JiraAuthentication
@@ -67,34 +67,51 @@ trait JiraApiServiceImpl extends JiraApiService {
 
   import services.JiraWSHelper._
 
-  val allProjectsUrl = "/rest/api/2/project?%s"
-  val projectVersionsUrl = "/rest/api/2/project/%s/version?%d&%d&%s&%s"
-  val versionsUrl = "/rest/api/2/project/%s/versions?%s"
-  val findIssuesUrl = "/rest/api/2/search?%s&%d&%d&%b&%s&%s"
+  val allProjectsUrl = "/rest/api/2/project?"
+  val projectVersionsUrl = "/rest/api/2/project/%s/version?"
+  val versionsUrl = "/rest/api/2/project/%s/versions?"
+  val findIssuesUrl = "/rest/api/2/search?"
 
   val ws: WSClient
   val config: JiraConfiguration
 
-  def getAllProjects(expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraProject]] = {    
-    val url = allProjectsUrl.format(expand)
+  def getAllProjects(expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraProject]] = {    
+    val params = getParamList(getParam("expand", expand))
+    val url = allProjectsUrl + params
     Logger.debug(s"getAllProjects(expand:$expand, url:$url")
     getList[JiraProject](url)
   }
 
-  def getProjectVersions(projectIdOrKey: String, startAt: Integer = 0, maxResults: Integer = 50, orderBy: String = "", expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext) = {
-    val url = projectVersionsUrl.format(projectIdOrKey, startAt, maxResults, orderBy, expand)
+  def getProjectVersions(projectIdOrKey: String, startAt: Option[Integer]=None, maxResults: Option[Integer] = None,
+    orderBy: Option[String] = None, expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraVersion]] = {
+    val params = getParamList(getParam("startAt", startAt), getParam("maxResults", maxResults), getParam("orderBy", orderBy), getParam("expand", expand))
+    val url = projectVersionsUrl.format(projectIdOrKey) + params
     getList[JiraVersion](url)
   }
 
-  def getVersions(projectIdOrKey: String, expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraVersion]] = {
-    val url = versionsUrl.format(projectIdOrKey, expand)
+  def getVersions(projectIdOrKey: String, expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraVersion]] = {
+    val params = getParamList(getParam("expand", expand))
+    val url = versionsUrl.format(projectIdOrKey) + params
     getList[JiraVersion](url)
   }
 
-  def findIssues(jql: String, startAt: Integer = 0, maxResults: Integer = 50,
-    validateQuery: Boolean = true, fields: String = "*navigatable", expand: String = "")(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraIssue]] = {
-    val url = findIssuesUrl.format(jql, startAt, maxResults, validateQuery, fields, expand)
+  def findIssues(jql: String, startAt: Option[Integer] = None, maxResults: Option[Integer] = None,
+    validateQuery: Option[Boolean] = None, fields: Option[String] = Some("*navigatable"), expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraIssue]] = {
+    val params = getParamList(getParam("jql", jql), getParam("startAt", startAt), getParam("maxResults", maxResults), getParam("validateQuery", validateQuery), getParam("fields", fields), getParam("expand", expand))
+    val url = findIssuesUrl + params
     getList[JiraIssue](url)
+  }
+  
+  def getParamList(params: Option[String]*) {
+    params.flatten.mkString("&")
+  }
+  
+  def getParam[T](name:String, value:T):Option[String] = {
+    getParam(name, Some(value))
+  }
+  
+  def getParam[T](name:String, value:Option[T]):Option[String] = {
+    value.map(v => name + "=" + URLEncoder.encode(v.toString, "UTF-8"))
   }
 
   def getList[T](relUrl: String)(implicit auth: JiraAuthentication, executionContext: ExecutionContext, reads: Reads[T]): Future[Seq[T]] = {

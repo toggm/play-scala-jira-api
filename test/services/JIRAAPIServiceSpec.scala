@@ -53,7 +53,7 @@ class JIRAAPIServiceSpec extends Specification {
         WsTestClient.withClient { implicit client =>
           val service = JiraApiServiceMock(client, config)
           val result = Await.result(
-            service.getAllProjects(expand), 10.seconds)
+            service.getAllProjects(), 10.seconds)
 
           result === Seq(JiraProject(new URI("http://test.com"), "1", "proj1", "projname", None))
         }
@@ -74,7 +74,7 @@ class JIRAAPIServiceSpec extends Specification {
         WsTestClient.withClient { implicit client =>
           val service = JiraApiServiceMock(client, config)
           val result = Await.result(
-            service.getVersions(projectId, ""), 10.seconds)
+            service.getVersions(projectId), 10.seconds)
           result === Seq(JiraVersion(new URI("http://test.com"), "1", "version1", "1.0", false, true))
         }
       }

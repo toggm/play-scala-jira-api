@@ -88,31 +88,17 @@ class JIRAAPIServiceSpec extends Specification {
 
       Server.withRouter() {
         case GET(p"/rest/api/2/search") => Action {
-          Results.Ok(Json.arr(Json.obj("self" -> "http://test.com", "id" -> "1", "key" -> "123")))
+          val json = """{"expand":"names,schema","startAt":0,"maxResults":1,"total":42,"issues":[{"expand":"editmeta,renderedFields,transitions,changelog,operations","id":"11749","self":"https://test.com/rest/api/2/issue/11749","key":"LAS-42"}]}"""          
+          Results.Ok(Json.parse(json))
         }
       } { implicit port =>
         WsTestClient.withClient { implicit client =>
           val service = JiraApiServiceMock(client, config)
           val result = Await.result(
             service.findIssues(jql), 10.seconds)
-          result === Seq(JiraIssue(id = "1", self = new URI("http://test.com"), key = "123"))
-        }
-      }
-    }
-    
-    "get correct result if only one object gets returnes" in {
-      val jql = "key='123'"
-
-      Server.withRouter() {
-        case GET(p"/rest/api/2/search") => Action {
-          Results.Ok(Json.obj("self" -> "http://test.com", "id" -> "1", "key" -> "123"))
-        }
-      } { implicit port =>
-        WsTestClient.withClient { implicit client =>
-          val service = JiraApiServiceMock(client, config)
-          val result = Await.result(
-            service.findIssues(jql), 10.seconds)
-          result === Seq(JiraIssue(id = "1", self = new URI("http://test.com"), key = "123"))
+          result.expand === "names,schema"
+          result.total === 42
+          result.issues.size === 1
         }
       }
     }

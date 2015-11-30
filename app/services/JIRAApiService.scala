@@ -55,7 +55,7 @@ trait JiraApiService {
    * Searches for issues using JQL.
    */
   def findIssues(jql: String, startAt: Option[Integer] = None, maxResults: Option[Integer] = None,
-    validateQuery: Option[Boolean] = None, fields: Option[String] = Some("*navigatable"), expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraIssue]]
+    validateQuery: Option[Boolean] = None, fields: Option[String] = Some("*navigatable"), expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[JiraSearchResult]
 }
 
 sealed trait JiraAuthentication
@@ -98,10 +98,10 @@ trait JiraApiServiceImpl extends JiraApiService {
   }
 
   def findIssues(jql: String, startAt: Option[Integer] = None, maxResults: Option[Integer] = None,
-    validateQuery: Option[Boolean] = None, fields: Option[String] = Some("*navigatable"), expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraIssue]] = {
+    validateQuery: Option[Boolean] = None, fields: Option[String] = Some("*navigatable"), expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[JiraSearchResult] = {
     val params = getParamList(getParam("jql", jql), getParam("startAt", startAt), getParam("maxResults", maxResults), getParam("validateQuery", validateQuery), getParam("fields", fields), getParam("expand", expand))
     val url = findIssuesUrl + params
-    getList[JiraIssue](url)
+    getSingleValue[JiraSearchResult](url)
   }
   
   def getParamList(params: Option[String]*):String =  {
@@ -132,13 +132,13 @@ trait JiraApiServiceImpl extends JiraApiService {
     }}    
   }
 
-  def getOption[T](relUrl: String)(implicit auth: JiraAuthentication, executionContext: ExecutionContext, reads: Reads[T]): Future[Option[T]] = {
+  def getSingleValue[T](relUrl: String)(implicit auth: JiraAuthentication, executionContext: ExecutionContext, reads: Reads[T]): Future[T] = {
     val url = config.baseUrl + relUrl
     Logger.debug(s"getOption(url:$url")
     JiraWSHelper.call(config, url, ws).flatMap { _ match {
       case Success(json) =>
         Logger.debug(s"getOption:Success -> $json")
-        Json.fromJson[T](json).asOpt.map(j => Future.successful(Some(j))).getOrElse(Future.failed(new RuntimeException(s"Could not parse $json")))
+        Json.fromJson[T](json).asOpt.map(j => Future.successful(j)).getOrElse(Future.failed(new RuntimeException(s"Could not parse $json")))
       case Failure(e) =>
         Logger.debug(s"getOption:Failure -> $e")
         Future.failed(e)

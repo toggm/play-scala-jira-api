@@ -75,7 +75,8 @@ trait JiraApiServiceImpl extends JiraApiService {
   val ws: WSClient
   val config: JiraConfiguration
 
-  def getAllProjects(expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraProject]] = {    
+  def getAllProjects(expand: Option[String] = None)(implicit auth: JiraAuthentication, executionContext: ExecutionContext): Future[Seq[JiraProject]] = {
+    
     val params = getParamList(getParam("expand", expand))
     val url = allProjectsUrl + params
     Logger.debug(s"getAllProjects(expand:$expand, url:$url")
@@ -102,7 +103,7 @@ trait JiraApiServiceImpl extends JiraApiService {
     getList[JiraIssue](url)
   }
   
-  def getParamList(params: Option[String]*) {
+  def getParamList(params: Option[String]*):String =  {
     params.flatten.mkString("&")
   }
   

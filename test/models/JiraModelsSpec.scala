@@ -54,6 +54,15 @@ class JiraModelsSpec extends Specification {
       val opt = Json.fromJson[JiraSearchResult](json).asOpt
       opt must not be None
     }
+    
+    "parse search result2 correctly" in {
+      val s = Source.fromFile("test/resources/jira_search_result2.json")
+      val result = s.mkString
+
+      val json = Json.parse(result)
+      val opt = Json.fromJson[JiraSearchResult](json).asOpt
+      opt must not be None
+    }
 
     "parse search results correctly" in {
       val s = Source.fromFile("test/resources/jira_search_results.json")

@@ -31,6 +31,7 @@ import org.apache.http.HttpException
 import java.io.IOException
 import scala.util.Failure
 import java.net.URLEncoder
+import play.api.libs.json._
 
 trait JiraApiService {
 
@@ -119,9 +120,12 @@ trait JiraApiServiceImpl extends JiraApiService {
     val url = config.baseUrl + relUrl
     Logger.debug(s"getList(url:$url")
     JiraWSHelper.call(config, url, ws).flatMap { _ match {
-      case Success(json) => 
-        Logger.debug(s"getList:Success -> $json")
+      case Success(json: JsArray) => 
+        Logger.debug(s"getList:Success -> $json")        
         Json.fromJson[Seq[T]](json).asOpt.map(j => Future.successful(j)).getOrElse(Future.failed(new RuntimeException(s"Could not parse $json")))
+      case Success(json) => 
+        Logger.debug(s"getList:Success -> $json")        
+        Json.fromJson[T](json).asOpt.map(j => Future.successful(Seq(j))).getOrElse(Future.failed(new RuntimeException(s"Could not parse $json")))
       case Failure(e) =>
         Logger.debug(s"getList:Failure -> $e")
         Future.failed(e)

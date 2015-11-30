@@ -99,6 +99,23 @@ class JIRAAPIServiceSpec extends Specification {
         }
       }
     }
+    
+    "get correct result if only one object gets returnes" in {
+      val jql = "key='123'"
+
+      Server.withRouter() {
+        case GET(p"/rest/api/2/search") => Action {
+          Results.Ok(Json.obj("self" -> "http://test.com", "id" -> "1", "key" -> "123"))
+        }
+      } { implicit port =>
+        WsTestClient.withClient { implicit client =>
+          val service = JiraApiServiceMock(client, config)
+          val result = Await.result(
+            service.findIssues(jql), 10.seconds)
+          result === Seq(JiraIssue(id = "1", self = new URI("http://test.com"), key = "123"))
+        }
+      }
+    }
   }
 
 }

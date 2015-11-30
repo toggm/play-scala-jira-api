@@ -1,0 +1,1 @@
+{"expand":"names,schema","startAt":0,"maxResults":1,"total":19,"issues":[{"expand":"editmeta,renderedFields,transitions,changelog,operations","id":"11748","self":"https://jira.tegonal.com/rest/api/2/issue/11748","key":"OO-19"}]}

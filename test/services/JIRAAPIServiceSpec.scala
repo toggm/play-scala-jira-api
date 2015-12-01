@@ -96,9 +96,29 @@ class JIRAAPIServiceSpec extends Specification {
           val service = JiraApiServiceMock(client, config)
           val result = Await.result(
             service.findIssues(jql), 10.seconds)
-          result.expand === "names,schema"
+          result.expand === Some("names,schema")
           result.total === 42
           result.issues.size === 1
+        }
+      }
+    }
+    
+    "parse without expand" in {
+      val jql = "key='123'"
+
+      Server.withRouter() {
+        case GET(p"/rest/api/2/search") => Action {
+          val json = """{"startAt":0,"maxResults":100,"total":22,"issues":[]}"""          
+          Results.Ok(Json.parse(json))
+        }
+      } { implicit port =>
+        WsTestClient.withClient { implicit client =>
+          val service = JiraApiServiceMock(client, config)
+          val result = Await.result(
+            service.findIssues(jql), 10.seconds)
+          result.expand === None
+          result.total === 22
+          result.issues.size === 0
         }
       }
     }

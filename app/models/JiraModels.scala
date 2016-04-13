@@ -55,7 +55,6 @@ case class SecondaryJiraIssueFields(
   environment: Option[String],
   timeestimate: Option[Date],
   components: Option[Seq[JiraComponent]],
-  timeoriginalestimate: Option[String],
   aggregatetimespent: Option[Int])
 
 case class SelfReferenceJiraIssueFields(

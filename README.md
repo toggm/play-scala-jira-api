@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/toggm/play-scala-jira-api.svg?branch=master)](https://travis-ci.org/toggm/play-scala-jira-api)
+
 # play-scala-jira-api
 Scala implementation to the public JIRA API based on Plays Webservice Framework
 

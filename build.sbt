@@ -1,8 +1,8 @@
-import play.PlayImport.PlayKeys._
+import play.sbt.PlayImport.PlayKeys._
 
 name := """play-scala-jira-api"""
 
-version := "1.0-SNAPSHOT"
+version := "1.0.1"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 

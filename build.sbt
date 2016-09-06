@@ -24,7 +24,7 @@ libraryDependencies ++= Seq(
   //"net.oauth.core" % "oauth" % "20100527",
   "net.oauth.core" % "oauth" % "20090825",
   ("net.oauth.core" % "oauth-httpclient4" % "20090913").exclude("net.oauth.core", "oauth-consumer"),
-  "com.adrianhurt" %% "play-bootstrap" % "1.1-P25-B3",
+  "com.adrianhurt" %% "play-bootstrap3" % "0.4.5-P24",
   "org.webjars" % "font-awesome" % "4.4.0",
   cache,
   ws
